@@ -3,7 +3,9 @@ var router = express.Router();
 
 const request = require('request');
 
-const apiKey = '389f1b6f60553efd3fb69db968fd7f23';
+const passport = require('passport');
+
+const apiKey = '1fb720b97cc13e580c2c35e1138f90f8';
 const apiBaseUrl = 'http://api.themoviedb.org/3';
 const nowPlayingUrl = `${apiBaseUrl}/movie/now_playing?api_key=${apiKey}`;
 const imageBaseUrl = 'http://image.tmdb.org/t/p/w300';
@@ -31,6 +33,16 @@ router.get('/', function(req, res, next) {
   })
   //res.render('index', { });
 });
+
+router.get('/login',passport.authenticate('github'));
+router.get('/auth',passport.authenticate('github',{
+  successRedirect: '/',
+  failureRedirect: '/loginFailed'
+}))
+
+router.get('/favorites',(req,res)=>{
+  res.json("Favorites ")
+})
 
 router.get('/movie/:id',(req,res,next)=>{
   //res.json(req.params.id)

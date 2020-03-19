@@ -3,12 +3,33 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require('express-session');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github').Strategy;
 
 var indexRouter = require('./routes/index');
 
 var app = express();
 const helmet = require('helmet');
 app.use(helmet());
+
+app.use(session({
+  secret: 'I love Express!',
+  resave: false,
+  saveUninitialized: true,
+  cookie:{secure:true}
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+const passportConfig = require('./config');
+passport.use(new GitHubStrategy(passportConfig,
+function(accessToken, refreshToken, profile, cb) {
+  User.findOrCreate({ githubId: profile.id }, function (err, user) {
+    return cb(err, user);
+  });
+}
+));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
